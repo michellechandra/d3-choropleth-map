@@ -8,22 +8,33 @@
 
 		/* On mouse hover, lighten state color */
 		path:hover {
-	    fill-opacity: .7;
+	    	fill-opacity: .7;
 		}
 
 		/* Style for Custom Tooltip */
-
 		div.tooltip {   
-  		position: absolute;           
-  		text-align: center;           
- 	    width: 60px;                  
-  		height: 28px;                 
-  		padding: 2px;             
- 	    font: 12px sans-serif;        
- 	    background: white;   
-  		border: 0px;      
-  		border-radius: 8px;           
-  		pointer-events: none;         
+  			position: absolute;           
+  			text-align: center;           
+ 	    	width: 60px;                  
+  			height: 28px;                 
+  			padding: 2px;             
+ 	    	font: 12px sans-serif;        
+ 	   		background: white;   
+  			border: 0px;      
+  			border-radius: 8px;           
+  			pointer-events: none;         
+		}
+        
+        /* Legend Font Style */
+		body {
+  			font: 11px sans-serif;
+		}
+        
+        /* Legend Position Style */
+		.legend {
+			position:absolute;
+			left:800px;
+			top:350px;
 		}
 
 		</style>
@@ -31,12 +42,18 @@
 	<body>
 		<script type="text/javascript">
 
-		/*  This visualization modifies choropleth example code provided by Scott Murray in "Interactive Data Visualization for the Web" 
+		/*  This visualization was made possible by modifying code provided by:
+
+		Scott Murray, Choropleth example from "Interactive Data Visualization for the Web" 
 		https://github.com/alignedleft/d3-book/blob/master/chapter_12/05_choropleth.html   
 		
-		Also modifies example tooltip code provided by Malcolm Maclean 
-		http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html      */
+		Malcolm Maclean, tooltips example tutorial
+		http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
 
+		Mike Bostock, Pie Chart Legend
+		http://bl.ocks.org/mbostock/3888852      */
+
+		
 		//Width and height of map
 		var w = 900;
 		var h = 600;
@@ -53,7 +70,9 @@
 		
 		// Define linear scale for output
 		var color = d3.scale.linear()
-							.range(["rgb(213,222,217)","rgb(69,173,168)","rgb(84,36,55)"]);
+							.range(["rgb(213,222,217)","rgb(69,173,168)","rgb(84,36,55)","rgb(217,91,67)"]);
+
+		var legendText = ["Cities Lived", "States Lived", "States Visited", "Nada"];
 
 		//Create SVG element and append map to the SVG
 		var svg = d3.select("body")
@@ -69,7 +88,7 @@
 
 		// Load in my states data!
 		d3.csv("stateslived.csv", function(data) {
-		color.domain([0,1,2]); // setting the range of the input data
+		color.domain([0,1,2,3]); // setting the range of the input data
 
 		// Load GeoJSON data and merge with states data
 		d3.json("us-states.json", function(json) {
@@ -147,8 +166,7 @@
         		//		 return d.place;
    				//});  
 
-		        // On mouseover, add custom tooltip
-		        // Modification of code provided by Malcolm Maclean, "D3 Tips and Tricks" 
+		        // Modification of custom tooltip code provided by Malcolm Maclean, "D3 Tips and Tricks" 
 		        // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
    				.on("mouseover", function(d) {      
             		div.transition()        
@@ -167,12 +185,32 @@
         	});
    		
 		});  
+        
+        // Modified Legend Code from Mike Bostock: http://bl.ocks.org/mbostock/3888852
+		var legend = d3.select("body").append("svg")
+      				   .attr("class", "legend")
+     				   .attr("width", 140)
+    				   .attr("height", 200)
+   					   .selectAll("g")
+   					   .data(color.domain().slice().reverse())
+   					   .enter()
+   					   .append("g")
+     				   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+  			legend.append("rect")
+   			      .attr("width", 18)
+   			      .attr("height", 18)
+   			      .style("fill", color);
+
+  			legend.append("text")
+  				  .data(legendText)
+      			  .attr("x", 24)
+      			  .attr("y", 9)
+      			  .attr("dy", ".35em")
+      		      .text(function(d) { return d; });
 	});
 
 });
-
-
 		/*  This code generate paths without mapping to other data
 		// Load JSON file and generate path for each state
 		d3.json("us-states.json", function(json) {  // file path, callback function called when data loaded

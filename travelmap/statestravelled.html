@@ -6,18 +6,42 @@
 		<script type="text/javascript" src="d3.v3.js"></script>
 		<style type="text/css">
 
+		/* On mouse hover, lighten state color */
+		path:hover {
+	    fill-opacity: .7;
+		}
+
+		/* Style for Custom Tooltip */
+
+		div.tooltip {   
+  		position: absolute;           
+  		text-align: center;           
+ 	    width: 60px;                  
+  		height: 28px;                 
+  		padding: 2px;             
+ 	    font: 12px sans-serif;        
+ 	    background: white;   
+  		border: 0px;      
+  		border-radius: 8px;           
+  		pointer-events: none;         
+		}
+
 		</style>
 	</head>
 	<body>
 		<script type="text/javascript">
 
-		/* Modifying choropleth example code provided by Scott Murray in "Interactive Data Visualization" */
+		/*  This visualization modifies choropleth example code provided by Scott Murray in "Interactive Data Visualization for the Web" 
+		https://github.com/alignedleft/d3-book/blob/master/chapter_12/05_choropleth.html   
+		
+		Also modifies example tooltip code provided by Malcolm Maclean 
+		http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html      */
 
-		//Width and height
+		//Width and height of map
 		var w = 900;
 		var h = 600;
 
-		// Use D3 Projection
+		// D3 Projection
 		var projection = d3.geo.albersUsa()
 							   .translate([w/2, h/2])    // translate to center of screen
 							   .scale([1000]);          // scale things down so see entire US
@@ -31,11 +55,17 @@
 		var color = d3.scale.linear()
 							.range(["rgb(213,222,217)","rgb(69,173,168)","rgb(84,36,55)"]);
 
-		//Create SVG element
+		//Create SVG element and append map to the SVG
 		var svg = d3.select("body")
 					.append("svg")
 					.attr("width", w)
 					.attr("height", h);
+        
+        // Append Div for tooltip to SVG
+		var div = d3.select("body")
+		            .append("div")   
+    			    .attr("class", "tooltip")               
+    				.style("opacity", 0);
 
 		// Load in my states data!
 		d3.csv("stateslived.csv", function(data) {
@@ -69,7 +99,7 @@
 				}
 			}
 		
-		// Bind the data and create one path per GeoJSON feature
+		// Bind the data to the SVG and create one path per GeoJSON feature
 		svg.selectAll("path")
 		   .data(json.features)
 		   .enter()
@@ -109,14 +139,38 @@
 					return Math.sqrt(d.years) * 4;
 				})
 		   	    .style("fill", "rgb(217,91,67)")	
-		   	    .style("opacity", 0.85);	   	   
+		   	    .style("opacity", 0.85)	
 
-			});
-			
-		});
-			
-	 });
+		   	    // add browser tooltip of city name
+		   	    //.append("title")
+   				//.text(function(d) {
+        		//		 return d.place;
+   				//});  
 
+		        // On mouseover, add custom tooltip
+		        // Modification of code provided by Malcolm Maclean, "D3 Tips and Tricks" 
+		        // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+   				.on("mouseover", function(d) {      
+            		div.transition()        
+               		   .duration(200)      
+               		   .style("opacity", .9);      
+            		   div.text(d.place)
+                	   .style("left", (d3.event.pageX) + "px")     
+                	   .style("top", (d3.event.pageY - 28) + "px");    
+            	})   
+
+            	// fade out tooltip on mouse out               
+        		.on("mouseout", function(d) {       
+           			 div.transition()        
+             		    .duration(500)      
+               		    .style("opacity", 0);   
+        	});
+   		
+		});  
+
+	});
+
+});
 
 
 		/*  This code generate paths without mapping to other data

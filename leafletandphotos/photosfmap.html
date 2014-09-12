@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leaflet and D3 Map</title>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"/>  
+    <style type="text/css">
+
+    #map {
+        width: 960px;
+        height: 500px;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+    <script>
+
+    var photos = [
+    ['<img src="http://www.michellechandra.com/wp-content/uploads/2013/04/urban-abstract-water-31.jpg" width="100" height="100" >', 37.794, -122.398],
+    ["photo2", 37.79,  -122.399],
+    ["photo3", 37.795, -122.4],
+    ["photo4", 37.794, -122.398],
+    ["photo5", 37.785, -122.397],
+    ["photo6", 37.785, -122.396]
+    ];
+    
+    // Store Stamen Map tiles as a new layer
+    var layer = new L.StamenTileLayer("toner");
+    
+    // Declare a new Leaflet Map, setView and Zoom Level
+    var map = new L.Map("map", {
+    center: new L.LatLng(37.79, -122.399),
+    zoom: 15,
+    maxZoom: 18
+    });
+    map.addLayer(layer);  // add Stamen Tile Layer to leaflet Map
+
+    // Add markers with popup photos
+    for(var i = 0; i<photos.length; i++) {
+        marker = new L.marker([photos[i][1], photos[i][2]])
+                      .bindPopup(photos[i][0])   
+     //  .bindPopup(popupContent)
+     //  .setContent('<img src="http://www.michellechandra.com/wp-content/uploads/2013/04/urban-abstract-water-31.jpg" width="100" height="100" >')
+                      .addTo(map);
+    }
+
+    </script>
+</body>
+</html>
